@@ -6,11 +6,11 @@ public abstract class CustomConcurrentQueue<T extends Object> {
   private int capacity;
   private ArrayList<T> buffer;
   private int elementsInBuffer = 0;
+  private ReentrantLock mutex = new ReentrantLock();
+	private Condition canGet = mutex.newCondition();
+	private Condition canSet = mutex.newCondition();
 	
 
-  ReentrantLock mutex = new ReentrantLock();
-	Condition canGet = mutex.newCondition();
-	Condition canSet = mutex.newCondition();
 
   public CustomConcurrentQueue(int capacity) {
     this.buffer = new ArrayList<T>(capacity);
@@ -26,7 +26,7 @@ public abstract class CustomConcurrentQueue<T extends Object> {
 				canSet.await();
 			}
 			int positionToAdd = elementsInBuffer;
-			buffer.set(positionToAdd, value);
+			buffer.add(positionToAdd, value);
 			elementsInBuffer++;
 			canGet.signalAll();
 		} catch (Exception e) {
