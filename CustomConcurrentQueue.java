@@ -2,10 +2,11 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-abstract class CustomConcurrentQueue<T extends Object> {
+public abstract class CustomConcurrentQueue<T extends Object> {
   private int capacity;
   private ArrayList<T> buffer;
   private int elementsInBuffer = 0;
+	
 
   ReentrantLock mutex = new ReentrantLock();
 	Condition canGet = mutex.newCondition();
@@ -15,8 +16,9 @@ abstract class CustomConcurrentQueue<T extends Object> {
     this.buffer = new ArrayList<T>(capacity);
     this.capacity = capacity;
   }
+
 	// place value into buffer
-	public  void set(T value) {
+	public void setItem(T value) {
 		try {
 			mutex.lock();
 			while(elementsInBuffer >= capacity) {
@@ -36,11 +38,11 @@ abstract class CustomConcurrentQueue<T extends Object> {
 	} // end method set 
 
 	// return value from buffer
-	public T get() {
+	public T getItem() {
 		T valueToReturn = null;
 		try {
 			mutex.lock();
-			while (elementsInBuffer == 0) {
+			while (isEmpty()) {
 				canSet.signalAll();
 				canGet.await();
 			}
@@ -56,6 +58,10 @@ abstract class CustomConcurrentQueue<T extends Object> {
 		}
 		return valueToReturn;
 	} // end method get
+
+	public boolean isEmpty() {
+		return elementsInBuffer == 0;
+	}
 
 	private void clearBufferInLocation(int location) {
 		buffer.set(location, null);
