@@ -11,7 +11,7 @@ public abstract class ProductQueueConsumer implements Runnable
 
   protected void printAction(String action) {
     System.out.println(String.format("%s: %s %s", this.getClass().getName(),
-       Timer.getCurrentTime(), action);  
+       Timer.getCurrentTime(), action));  
   }
 
   protected ProductQueueConsumer(ProductQueue productQueue) {
